@@ -1,6 +1,11 @@
+import os
 import discord
+from keep_alive import keep_alive
 
-TOKEN = "MTUyOTExMDkwMDcxNDUwNDE5Mw.GlXQtp.4insnm4j9VldBvN7d2rNJCX8uEegY5wI-uLELw"
+# Start the web server
+keep_alive()
+
+TOKEN = os.environ["TOKEN"]  # Set this in Render Environment Variables
 
 TARGET_CHANNEL_ID = 1529112525998784584
 
@@ -57,7 +62,6 @@ async def on_message(message):
         target = client.get_channel(TARGET_CHANNEL_ID)
 
         if target:
-
             await target.send(
                 f"📦 **Delivery Ready**\n\n"
                 f"{message.jump_url}"
