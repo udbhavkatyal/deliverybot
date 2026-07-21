@@ -21,16 +21,16 @@ MONITORED_CHANNELS = {
 # (Project, New List) -> Destination Channel
 ROUTES = {
     ("gfx-a max level", "changes"): 1529209875505348628,
-    ("gfx-a max level", "zappp"): 1529209943767646208,
+    ("gfx-a max level", "zap"): 1529209943767646208,
 
     ("socials max level", "changes"): 1529211127890837554,
-    ("socials max level", "zappp"): 1529210990909194280,
+    ("socials max level", "zap"): 1529210990909194280,
 
     ("video trimax", "changes"): 1529212411238944888,
-    ("video trimax", "zappp"): 1529212366208634940,
+    ("video trimax", "zap"): 1529212366208634940,
 
     ("gfx-b trimax", "changes"): 1529212768287199252,
-    ("gfx-b trimax", "zappp"): 1529212728693100726,
+    ("gfx-b trimax", "zap"): 1529212728693100726,
 }
 
 intents = discord.Intents.default()
