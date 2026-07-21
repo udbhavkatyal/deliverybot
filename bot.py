@@ -2,7 +2,7 @@ import os
 import discord
 from keep_alive import keep_alive
 
-# Start web server (for Render Web Service / health check)
+# Start web server (for Render)
 keep_alive()
 
 TOKEN = os.environ["TOKEN"]
@@ -18,7 +18,7 @@ MONITORED_CHANNELS = {
     1528613251557097512,
 }
 
-# (Project, Status) -> Destination Channel
+# (Project, New List) -> Destination Channel
 ROUTES = {
     ("gfx-a max level", "changes"): 1529209875505348628,
     ("gfx-a max level", "zappp"): 1529209943767646208,
@@ -47,7 +47,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    # Ignore this bot's own messages
+    # Ignore only this bot's own messages
     if message.author.id == client.user.id:
         return
 
@@ -55,36 +55,42 @@ async def on_message(message):
     if message.channel.id not in MONITORED_CHANNELS:
         return
 
-    searchable = message.content or ""
+    # Used for finding the project name
+    searchable = (message.content or "").lower()
 
-    # Include all embed text
+    # We'll ONLY use this for Delivery / Changes / ZAPPP
+    new_list = ""
+
     for embed in message.embeds:
 
+        # Project name can appear in these places
         if embed.title:
-            searchable += " " + embed.title
+            searchable += " " + embed.title.lower()
 
         if embed.description:
-            searchable += " " + embed.description
+            searchable += " " + embed.description.lower()
 
         if embed.author and embed.author.name:
-            searchable += " " + embed.author.name
+            searchable += " " + embed.author.name.lower()
 
         if embed.footer and embed.footer.text:
-            searchable += " " + embed.footer.text
+            searchable += " " + embed.footer.text.lower()
 
+        # Read only the New List field
         for field in embed.fields:
-            searchable += f" {field.name} {field.value}"
 
-    searchable = searchable.lower()
+            if field.name.strip().lower() == "new list":
+                new_list = field.value.strip().lower()
 
     print("=" * 60)
-    print(searchable)
+    print("SEARCHABLE:", searchable)
+    print("NEW LIST :", new_list)
     print("=" * 60)
 
     # -----------------------------
     # DELIVERY
     # -----------------------------
-    if "delivery" in searchable:
+    if "delivery" in new_list:
 
         delivery_channel = client.get_channel(DELIVERY_CHANNEL_ID)
 
@@ -98,20 +104,24 @@ async def on_message(message):
     # -----------------------------
     for (project, status), destination in ROUTES.items():
 
-        if project in searchable and status in searchable:
+        if project in searchable and status in new_list:
 
             target = client.get_channel(destination)
 
             if target:
 
                 if status == "zappp":
+
                     await target.send(
-                        f"Need your attention please, ⚡ **ZAP Request**\n\n{message.jump_url}"
+                        f"Need your attention please, ⚡ **ZAP Request**\n\n"
+                        f"{message.jump_url}"
                     )
 
-                else:  # Changes
+                elif status == "changes":
+
                     await target.send(
-                        f"📨 Changes aya hai\n\n{message.jump_url}"
+                        f"📨 Changes aya hai\n\n"
+                        f"{message.jump_url}"
                     )
 
             break
