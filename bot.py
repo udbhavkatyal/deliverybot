@@ -2,16 +2,36 @@ import os
 import discord
 from keep_alive import keep_alive
 
-# Start the web server
+# Start web server (for Render Web Service / health check)
 keep_alive()
 
-TOKEN = os.environ["TOKEN"]  # Set this in Render Environment Variables
+TOKEN = os.environ["TOKEN"]
 
-TARGET_CHANNEL_ID = 1529112525998784584
+# Delivery notification channel
+DELIVERY_CHANNEL_ID = 1529112525998784584
 
-KEYWORDS = [
-    "delivery"
-]
+# Only monitor these channels
+MONITORED_CHANNELS = {
+    1528616846872547348,
+    1528618690365620226,
+    1528068088317350059,
+    1528613251557097512,
+}
+
+# (Project, Status) -> Destination Channel
+ROUTES = {
+    ("gfx-a max level", "changes"): 1529209875505348628,
+    ("gfx-a max level", "zappp"): 1529209943767646208,
+
+    ("socials max level", "changes"): 1529211127890837554,
+    ("socials max level", "zappp"): 1529210990909194280,
+
+    ("video trimax", "changes"): 1529212411238944888,
+    ("video trimax", "zappp"): 1529212366208634940,
+
+    ("gfx-b trimax", "changes"): 1529212768287199252,
+    ("gfx-b trimax", "zappp"): 1529212728693100726,
+}
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -27,8 +47,12 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    # Ignore only THIS bot's own messages
+    # Ignore this bot's own messages
     if message.author.id == client.user.id:
+        return
+
+    # Only monitor selected channels
+    if message.channel.id not in MONITORED_CHANNELS:
         return
 
     searchable = message.content or ""
@@ -42,30 +66,55 @@ async def on_message(message):
         if embed.description:
             searchable += " " + embed.description
 
-        for field in embed.fields:
-            searchable += f" {field.name} {field.value}"
+        if embed.author and embed.author.name:
+            searchable += " " + embed.author.name
 
         if embed.footer and embed.footer.text:
             searchable += " " + embed.footer.text
 
-        if embed.author and embed.author.name:
-            searchable += " " + embed.author.name
+        for field in embed.fields:
+            searchable += f" {field.name} {field.value}"
 
     searchable = searchable.lower()
 
-    print("SEARCHABLE:")
+    print("=" * 60)
     print(searchable)
-    print("-" * 50)
+    print("=" * 60)
 
-    if any(word in searchable for word in KEYWORDS):
+    # -----------------------------
+    # DELIVERY
+    # -----------------------------
+    if "delivery" in searchable:
 
-        target = client.get_channel(TARGET_CHANNEL_ID)
+        delivery_channel = client.get_channel(DELIVERY_CHANNEL_ID)
 
-        if target:
-            await target.send(
-                f"📦 **Delivery Ready**\n\n"
-                f"{message.jump_url}"
+        if delivery_channel:
+            await delivery_channel.send(
+                f"📦 **Delivery Ready**\n\n{message.jump_url}"
             )
+
+    # -----------------------------
+    # ROUTING
+    # -----------------------------
+    for (project, status), destination in ROUTES.items():
+
+        if project in searchable and status in searchable:
+
+            target = client.get_channel(destination)
+
+            if target:
+
+                if status == "zappp":
+                    await target.send(
+                        f"Need your attention please, ⚡ **ZAP Request**\n\n{message.jump_url}"
+                    )
+
+                else:  # Changes
+                    await target.send(
+                        f"📨 Changes aya hai\n\n{message.jump_url}"
+                    )
+
+            break
 
 
 client.run(TOKEN)
