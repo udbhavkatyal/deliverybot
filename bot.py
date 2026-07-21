@@ -34,7 +34,28 @@ ROUTES = {
 
     ("gfx-b trimax", "changes"): 1529212768287199252,
     ("gfx-b trimax", "zappp"): 1529212728693100726,
-    ("gfx-b trimax", "zappp"): 1529226642688577687
+    ("gfx-b trimax", "please review"): 1529226642688577687
+}
+
+GENERAL_ROUTES = {
+    "gfx-a max level": 1529244047657533500,
+    "socials max level": 1529243389923557396,
+    "video trimax": 1529243080585248981,
+    "gfx-b trimax": 1529244101055086632,
+}
+
+IGNORED_LISTS = {
+    "done",
+    "saved stuff",
+    "ideas/trends",
+    "awaiting inputs",
+    "please review",
+    "zappp",
+    "⚡zappp",
+    "changes",
+    "priority list",
+    "client review",
+    "delivery",
 }
 
 intents = discord.Intents.default()
@@ -85,6 +106,7 @@ async def on_message(message):
 
             if field.name.strip().lower() == "new list":
                 new_list = field.value.strip().lower()
+                new_list = new_list.replace("⚡", "").strip()
 
     print("=" * 60)
     print("SEARCHABLE:", searchable)
@@ -106,9 +128,11 @@ async def on_message(message):
     # -----------------------------
     # ROUTING
     # -----------------------------
+    handled = False
+
     for (project, status), destination in ROUTES.items():
 
-        if project in searchable and status in new_list:
+        if project in searchable and status == new_list:
 
             target = client.get_channel(destination)
 
@@ -135,7 +159,43 @@ async def on_message(message):
                         f"{message.jump_url}"
                     )
 
+            handled = True
             break
+
+    # -----------------------------
+    # GENERAL LIST ROUTING
+    # -----------------------------
+    if (
+        not handled
+        and new_list
+        and new_list not in {
+            "done",
+            "saved stuff",
+            "ideas/trends",
+            "awaiting inputs",
+            "please review",
+            "zappp",
+            "⚡zappp",
+            "changes",
+            "priority list",
+            "client review",
+            "delivery",
+        }
+    ):
+
+        for project, destination in GENERAL_ROUTES.items():
+
+            if project in searchable:
+
+                target = client.get_channel(destination)
+
+                if target:
+                    await target.send(
+                        f"🏷️ Task raised. Client/Project: {new_list.title()}\n\n"
+                        f"{message.jump_url}"
+                    )
+
+                break
 
 
 client.run(TOKEN)
