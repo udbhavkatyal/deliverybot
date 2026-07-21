@@ -22,15 +22,19 @@ MONITORED_CHANNELS = {
 ROUTES = {
     ("gfx-a max level", "changes"): 1529209875505348628,
     ("gfx-a max level", "zappp"): 1529209943767646208,
+    ("gfx-a max level", "please review"): 1529226562958786731,
 
     ("socials max level", "changes"): 1529211127890837554,
     ("socials max level", "zappp"): 1529210990909194280,
+    ("socials max level", "please review"): 1529226439851905054,
 
     ("video trimax", "changes"): 1529212411238944888,
     ("video trimax", "zappp"): 1529212366208634940,
+    ("video trimax", "please review"): 1529225648952840262,
 
     ("gfx-b trimax", "changes"): 1529212768287199252,
     ("gfx-b trimax", "zappp"): 1529212728693100726,
+    ("gfx-b trimax", "zappp"): 1529226642688577687
 }
 
 intents = discord.Intents.default()
@@ -121,6 +125,13 @@ async def on_message(message):
 
                     await target.send(
                         f"📨 Changes aya hai\n\n"
+                        f"{message.jump_url}"
+                    )
+
+                elif status == "please review":
+
+                    await target.send(
+                        f"🚔 Review and quality check required!\n\n"
                         f"{message.jump_url}"
                     )
 
