@@ -44,6 +44,16 @@ GENERAL_ROUTES = {
     "gfx-b trimax": 1529244101055086632,
 }
 
+COMMENT_ROUTES = {
+    "@faizanahmad116": 1529466762943271082,
+    "@bishalhaldar": 1529466857449586770,
+    "@pushpindersingh44": 1529467024281964674,
+    "@yashtehlan": 1529467090329665576,
+    "@ankit1005": 1529467211213705386,
+    "@abhishekkharwar": 1529467141214961704,
+    "@udbhavkatyal1": 1529467607139356743,
+}
+
 IGNORED_LISTS = {
     "done",
     "saved stuff",
@@ -91,6 +101,9 @@ async def on_message(message):
     # Destination list (works for both moved and newly created cards)
     new_list = ""
 
+    # Trello comment text
+    comment_text = ""
+
     for embed in message.embeds:
 
         # Project name can appear in these places
@@ -98,7 +111,9 @@ async def on_message(message):
             searchable += " " + embed.title.lower()
 
         if embed.description:
-            searchable += " " + embed.description.lower()
+            desc = embed.description.lower()
+            searchable += " " + desc
+            comment_text += " " + desc
 
         if embed.author and embed.author.name:
             searchable += " " + embed.author.name.lower()
@@ -122,7 +137,32 @@ async def on_message(message):
     print("=" * 60)
     print("SEARCHABLE:", searchable)
     print("NEW LIST :", new_list)
+    print("COMMENT  :", comment_text)
     print("=" * 60)
+
+    # -----------------------------
+    # COMMENT MENTIONS
+    # -----------------------------
+    if comment_text:
+
+        sent_channels = set()
+
+        for username, destination in COMMENT_ROUTES.items():
+
+            if username.lower() in comment_text:
+
+                if destination in sent_channels:
+                    continue
+
+                target = client.get_channel(destination)
+
+                if target:
+                    await target.send(
+                        f"💬 You were mentioned in a Trello comment.\n\n"
+                        f"{message.jump_url}"
+                    )
+
+                    sent_channels.add(destination)
 
     # -----------------------------
     # DELIVERY
