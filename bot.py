@@ -173,7 +173,7 @@ async def on_message(message):
 
         if delivery_channel:
             await delivery_channel.send(
-                f"📦 **Delivery Ready**\n\n{message.jump_url}"
+                f"📦 Delivery Ready\n\n{message.jump_url}"
             )
 
     # -----------------------------
