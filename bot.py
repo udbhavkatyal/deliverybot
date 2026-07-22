@@ -34,7 +34,7 @@ ROUTES = {
 
     ("gfx-b trimax", "changes"): 1529212768287199252,
     ("gfx-b trimax", "zappp"): 1529212728693100726,
-    ("gfx-b trimax", "please review"): 1529226642688577687
+    ("gfx-b trimax", "please review"): 1529226642688577687,
 }
 
 GENERAL_ROUTES = {
@@ -57,6 +57,11 @@ IGNORED_LISTS = {
     "client review",
     "delivery",
 }
+
+
+def normalize_list_name(name):
+    return name.lower().replace("⚡", "").strip()
+
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -83,7 +88,7 @@ async def on_message(message):
     # Used for finding the project name
     searchable = (message.content or "").lower()
 
-    # We'll ONLY use this for Delivery / Changes / ZAPPP
+    # Destination list (works for both moved and newly created cards)
     new_list = ""
 
     for embed in message.embeds:
@@ -101,12 +106,18 @@ async def on_message(message):
         if embed.footer and embed.footer.text:
             searchable += " " + embed.footer.text.lower()
 
-        # Read only the New List field
+        # Read only the destination list
         for field in embed.fields:
 
-            if field.name.strip().lower() == "new list":
-                new_list = field.value.strip().lower()
-                new_list = new_list.replace("⚡", "").strip()
+            field_name = field.name.strip().lower()
+
+            # Card moved
+            if field_name == "new list":
+                new_list = normalize_list_name(field.value)
+
+            # Card created
+            elif field_name == "list" and not new_list:
+                new_list = normalize_list_name(field.value)
 
     print("=" * 60)
     print("SEARCHABLE:", searchable)
@@ -116,7 +127,7 @@ async def on_message(message):
     # -----------------------------
     # DELIVERY
     # -----------------------------
-    if "delivery" in new_list:
+    if new_list == "delivery":
 
         delivery_channel = client.get_channel(DELIVERY_CHANNEL_ID)
 
@@ -168,19 +179,7 @@ async def on_message(message):
     if (
         not handled
         and new_list
-        and new_list not in {
-            "done",
-            "saved stuff",
-            "ideas/trends",
-            "awaiting inputs",
-            "please review",
-            "zappp",
-            "⚡zappp",
-            "changes",
-            "priority list",
-            "client review",
-            "delivery",
-        }
+        and new_list not in IGNORED_LISTS
     ):
 
         for project, destination in GENERAL_ROUTES.items():
