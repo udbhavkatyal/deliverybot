@@ -45,13 +45,13 @@ GENERAL_ROUTES = {
 }
 
 COMMENT_ROUTES = {
-    "@faizanahmad116": 1529466762943271082,
-    "@bishalhaldar": 1529466857449586770,
-    "@pushpindersingh44": 1529467024281964674,
-    "@yashtehlan": 1529467090329665576,
-    "@ankit1005": 1529467211213705386,
-    "@abhishekkharwar": 1529467141214961704,
-    "@udbhavkatyal1": 1529467607139356743,
+    "@faizanahmad116": ("Faizan", 1529466762943271082),
+    "@bishalhaldar": ("Bishal", 1529466857449586770),
+    "@pushpindersingh44": ("Pushpinder", 1529467024281964674),
+    "@yashtehlan": ("Yash", 1529467090329665576),
+    "@ankit1005": ("Ankit", 1529467211213705386),
+    "@abhishekkharwar": ("Abhishek", 1529467141214961704),
+    "@udbhavkatyal1": ("Udbhav", 1529467607139356743),
 }
 
 IGNORED_LISTS = {
@@ -147,7 +147,7 @@ async def on_message(message):
 
         sent_channels = set()
 
-        for username, destination in COMMENT_ROUTES.items():
+        for username, (display_name, destination) in COMMENT_ROUTES.items():
 
             if username.lower() in comment_text:
 
@@ -158,7 +158,7 @@ async def on_message(message):
 
                 if target:
                     await target.send(
-                        f"💬 You were mentioned in a Trello comment.\n\n"
+                        f"📮 {display_name}, you were mentioned, please check.\n\n"
                         f"{message.jump_url}"
                     )
 
