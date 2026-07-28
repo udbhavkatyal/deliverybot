@@ -52,6 +52,7 @@ COMMENT_ROUTES = {
     "@ankit1005": ("Ankit", 1529467211213705386),
     "@abhishekkharwar": ("Abhishek", 1529467141214961704),
     "@udbhavkatyal1": ("Udbhav", 1529467607139356743),
+    "@raymondbriones1": ("RJ", 1531664708229136545),
 }
 
 IGNORED_LISTS = {
