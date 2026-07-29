@@ -41,7 +41,7 @@ GENERAL_ROUTES = {
     "gfx-a max level": 1529244047657533500,
     "socials max level": 1529243389923557396,
     "video trimax": 1529243080585248981,
-    "gfx-b trimax": 1529244101055086632,
+    "gfx-b trimax": 1531931290792890488,
 }
 
 COMMENT_ROUTES = {
