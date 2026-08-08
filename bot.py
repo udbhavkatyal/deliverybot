@@ -9,6 +9,8 @@ TOKEN = os.environ["TOKEN"]
 
 # Delivery notification channel
 DELIVERY_CHANNEL_ID = 1529112525998784584
+QC_CHANNEL_ID = 1535631997597392926
+QC_SOURCE_CHANNEL_ID = 1528616846872547348
 
 # Only monitor these channels
 MONITORED_CHANNELS = {
@@ -176,6 +178,22 @@ async def on_message(message):
         if delivery_channel:
             await delivery_channel.send(
                 f"📦 Delivery Ready\n\n{message.jump_url}"
+            )
+
+    # -----------------------------
+    # QC REQUIRED
+    # -----------------------------
+    if (
+        message.channel.id == QC_SOURCE_CHANNEL_ID
+        and new_list == "qc"
+    ):
+
+        qc_channel = client.get_channel(QC_CHANNEL_ID)
+
+        if qc_channel:
+            await qc_channel.send(
+                f"🚨 **QC required**\n\n"
+                f"{message.jump_url}"
             )
 
     # -----------------------------
