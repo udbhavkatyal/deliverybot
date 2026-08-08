@@ -192,7 +192,7 @@ async def on_message(message):
 
         if qc_channel:
             await qc_channel.send(
-                f"🚨 **QC required**\n\n"
+                f"🚔 **QC required**\n\n"
                 f"{message.jump_url}"
             )
 
